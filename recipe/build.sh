@@ -1,7 +1,5 @@
 #!/bin/bash
 
-pushd plugins_base
-
 # The datarootdir option places the docs into a temp folder that won't
 # be included in the package (it is about 12MB).
 # You need to enable opengl to get gstallocators

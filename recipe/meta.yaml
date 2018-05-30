@@ -1,41 +1,67 @@
-{% set version = "1.8.0" %}
-{% set sha256 = "abc0acc1d15b4b9c97c65cd9689bd6400081853b9980ea428d3c8572dd791522" %}
+{% set version = "1.14.1" %}
+{% set sha256 = "1026c7c3082d825d9b5d034c1a6dd8a4ebab60eb3738b0a0afde4ad2dc0b0db5" %}
 
 package:
   name: gst-plugins-base
   version: {{ version }}
 
 source:
-  fn: gst-plugins-base-{{ version }}.tar.xz
   url: https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-{{ version }}.tar.xz
   sha256: {{ sha256 }}
 
 build:
-  skip: true  # [win or osx]
+  skip: true  # [win]
   number: 0
+  #run_exports:
+      # remove symbols at .90 patch releases just before minor versions?
+      #    https://abi-laboratory.pro/tracker/timeline/gstreamer/
+  #    - {{ pin_subpackage('gst-plugins-base', max_pin='x.x') }}
 
 requirements:
   build:
-    - gstreamer 1.8.*
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - {{ cdt('libxau-devel') }}          # [linux]
+    - {{ cdt('libxext-devel') }}         # [linux]
+    - {{ cdt('libx11-devel') }}          # [linux]
+    - {{ cdt('libxrender-devel') }}      # [linux]
+    - {{ cdt('xorg-x11-proto-devel') }}  # [linux]
+    - {{ cdt('mesa-libgl-devel') }}      # [linux]
+    - {{ cdt('libdrm-devel') }}          # [linux]
+    - {{ cdt('libxdamage-devel') }}      # [linux]
+    - {{ cdt('libxfixes-devel') }}       # [linux]
+    - {{ cdt('libxxf86vm-devel') }}      # [linux]
+    - pkg-config
     - m4
+    - autoconf
+    - automake
+    - make
     - perl
-    - xz 5.2.*
+  host:
+    - {{ pin_subpackage('gstreamer') }}
+    - glib
+    - zlib
+    - gettext                            # [osx]
+    - libxcb                             # [linux]
+    - pthread-stubs                      # [linux]
+    - xz
   run:
-    - gstreamer 1.8.*
+    - {{ pin_compatible('gstreamer') }}
 
 test:
   commands:
-    - test -f $PREFIX/lib/libgstallocators-1.0.so
-    - test -f $PREFIX/lib/libgstapp-1.0.so
-    - test -f $PREFIX/lib/libgstaudio-1.0.so
-    - test -f $PREFIX/lib/libgstfft-1.0.so
-    - test -f $PREFIX/lib/libgstpbutils-1.0.so
-    - test -f $PREFIX/lib/libgstriff-1.0.so
-    - test -f $PREFIX/lib/libgstrtp-1.0.so
-    - test -f $PREFIX/lib/libgstrtsp-1.0.so
-    - test -f $PREFIX/lib/libgstsdp-1.0.so
-    - test -f $PREFIX/lib/libgsttag-1.0.so
-    - test -f $PREFIX/lib/libgstvideo-1.0.so
+    {% set SOEXT = 'dylib' if osx else 'so' %}
+    - test -f $PREFIX/lib/libgstallocators-1.0.{{ SOEXT }}
+    - test -f $PREFIX/lib/libgstapp-1.0.{{ SOEXT }}
+    - test -f $PREFIX/lib/libgstaudio-1.0.{{ SOEXT }}
+    - test -f $PREFIX/lib/libgstfft-1.0.{{ SOEXT }}
+    - test -f $PREFIX/lib/libgstpbutils-1.0.{{ SOEXT }}
+    - test -f $PREFIX/lib/libgstriff-1.0.{{ SOEXT }}
+    - test -f $PREFIX/lib/libgstrtp-1.0.{{ SOEXT }}
+    - test -f $PREFIX/lib/libgstrtsp-1.0.{{ SOEXT }}
+    - test -f $PREFIX/lib/libgstsdp-1.0.{{ SOEXT }}
+    - test -f $PREFIX/lib/libgsttag-1.0.{{ SOEXT }}
+    - test -f $PREFIX/lib/libgstvideo-1.0.{{ SOEXT }}
 
 about:
     home: http://gstreamer.freedesktop.org/
